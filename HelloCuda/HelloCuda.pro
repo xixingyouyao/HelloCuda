@@ -4,8 +4,7 @@
 #
 #-------------------------------------------------
 
-CONFIG   += console
-QT       += core
+CONFIG += console
 
 TARGET = HelloCuda
 
@@ -13,11 +12,11 @@ TARGET = HelloCuda
 DESTDIR = ../bin
 CUDA_OBJECTS_DIR = OBJECTS_DIR/../cuda
 
-SOURCES += main.cpp
-
 # This makes the .cu files appear in your project
-OTHER_FILES += vectorAddition.cu
-CUDA_SOURCES += vectorAddition.cu
+OTHER_FILES += \
+    vectorAdd.cu
+CUDA_SOURCES += \
+    vectorAdd.cu
 
 #-------------------------------------------------
 
@@ -27,7 +26,6 @@ SYSTEM_NAME = Win32                 # Depending on your system either 'Win32', '
 SYSTEM_TYPE = 32                    # '32' or '64', depending on your system
 CUDA_ARCH = sm_30                   # Type of CUDA architecture
 NVCC_OPTIONS = --use_fast_math
-NVCC_COMPILER_OPTIONS = "/wd4819"   # Disable C4819 Warnings
 
 # include paths
 INCLUDEPATH += $$CUDA_DIR/include \
@@ -43,15 +41,14 @@ QMAKE_LIBDIR += $$CUDA_DIR/lib/$$SYSTEM_NAME \
 CUDA_INC = $$join(INCLUDEPATH,'" -I"','-I"','"')
 
 # Add the necessary libraries
-CUDA_LIB_NAMES = cuda cudart
+CUDA_LIB_NAMES = cudart_static kernel32 user32 gdi32 winspool comdlg32 \
+                 advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32 \
+                 #freeglut glew32
+
 for(lib, CUDA_LIB_NAMES) {
     CUDA_LIBS += -l$$lib
 }
 LIBS += $$CUDA_LIBS
-
-# The following library conflicts with something in Cuda
-QMAKE_LFLAGS_RELEASE = /NODEFAULTLIB:msvcrt.lib
-QMAKE_LFLAGS_DEBUG   = /NODEFAULTLIB:msvcrtd.lib
 
 # Configuration of the Cuda compiler
 CONFIG(debug, debug|release) {
@@ -60,7 +57,8 @@ CONFIG(debug, debug|release) {
     cuda_d.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
     cuda_d.commands = $$CUDA_DIR/bin/nvcc.exe -D_DEBUG $$NVCC_OPTIONS $$CUDA_INC $$LIBS \
                       --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH \
-                      --compiler-options $$NVCC_COMPILER_OPTIONS \
+                      --compile -Xcompiler "/wd4819" -g \
+                      -DWIN32 -D_MBCS -Xcompiler "/EHsc,/W3,/nologo,/Od,/Zi,/RTC1,/MTd" \
                       -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
     cuda_d.dependency_type = TYPE_C
     QMAKE_EXTRA_COMPILERS += cuda_d
@@ -71,9 +69,9 @@ else {
     cuda.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
     cuda.commands = $$CUDA_DIR/bin/nvcc.exe $$NVCC_OPTIONS $$CUDA_INC $$LIBS \
                     --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH \
-                    --compiler-options $$NVCC_COMPILER_OPTIONS \
+                    --compile -Xcompiler "/wd4819" -cudart static \
+                    -DWIN32 -Xcompiler "/EHsc,/nologo,/Zi,/MT" \
                     -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
     cuda.dependency_type = TYPE_C
     QMAKE_EXTRA_COMPILERS += cuda
 }
-

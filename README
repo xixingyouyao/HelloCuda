@@ -1,3 +1,5 @@
 Cuda example project with Qt Creator on Windows(Using MSVC compiler)
 
-It shows how to set up the environment of building Cuda code with Qt Creator and MSVC compiler on Windows. For more details please visit my blog(Chinese Simplify) http://robot9.me/cuda_qtcreator_windows/
+It shows how to set up the environment of building Cuda code with Qt Creator and MSVC compiler on Windows. For more details please visit my blog(Chinese Simplify) 
+
+http://robot9.me/cuda_qtcreator_windows/
