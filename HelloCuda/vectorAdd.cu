@@ -39,6 +39,7 @@ vectorAdd(const float *A, const float *B, float *C, int numElements)
     }
 }
 
+
 /**
  * Host main routine
  */
