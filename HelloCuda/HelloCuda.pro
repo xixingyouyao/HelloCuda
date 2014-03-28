@@ -20,6 +20,10 @@ CUDA_SOURCES += \
 
 #-------------------------------------------------
 
+# MSVCRT link option (static or dynamic, it must be the same with your Qt SDK link option)
+MSVCRT_LINK_FLAG_DEBUG   = "/MDd"
+MSVCRT_LINK_FLAG_RELEASE = "/MD"
+
 # CUDA settings
 CUDA_DIR = "D:/CUDA"                # Path to cuda toolkit install
 SYSTEM_NAME = Win32                 # Depending on your system either 'Win32', 'x64', or 'Win64'
@@ -57,8 +61,9 @@ CONFIG(debug, debug|release) {
     cuda_d.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
     cuda_d.commands = $$CUDA_DIR/bin/nvcc.exe -D_DEBUG $$NVCC_OPTIONS $$CUDA_INC $$LIBS \
                       --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH \
-                      --compile -Xcompiler "/wd4819" -g \
-                      -DWIN32 -D_MBCS -Xcompiler "/EHsc,/W3,/nologo,/Od,/Zi,/RTC1,/MTd" \
+                      --compile -cudart static -g -DWIN32 -D_MBCS \
+                      -Xcompiler "/wd4819,/EHsc,/W3,/nologo,/Od,/Zi,/RTC1" \
+                      -Xcompiler $$MSVCRT_LINK_FLAG_DEBUG \
                       -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
     cuda_d.dependency_type = TYPE_C
     QMAKE_EXTRA_COMPILERS += cuda_d
@@ -69,8 +74,9 @@ else {
     cuda.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
     cuda.commands = $$CUDA_DIR/bin/nvcc.exe $$NVCC_OPTIONS $$CUDA_INC $$LIBS \
                     --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH \
-                    --compile -Xcompiler "/wd4819" -cudart static \
-                    -DWIN32 -Xcompiler "/EHsc,/nologo,/Zi,/MT" \
+                    --compile -cudart static -DWIN32 -D_MBCS \
+                    -Xcompiler "/wd4819,/EHsc,/W3,/nologo,/O2,/Zi,/MD" \
+                    -Xcompiler $$MSVCRT_LINK_FLAG_RELEASE \
                     -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
     cuda.dependency_type = TYPE_C
     QMAKE_EXTRA_COMPILERS += cuda
