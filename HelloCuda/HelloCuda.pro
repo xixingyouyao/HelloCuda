@@ -75,7 +75,7 @@ else {
     cuda.commands = $$CUDA_DIR/bin/nvcc.exe $$NVCC_OPTIONS $$CUDA_INC $$LIBS \
                     --machine $$SYSTEM_TYPE -arch=$$CUDA_ARCH \
                     --compile -cudart static -DWIN32 -D_MBCS \
-                    -Xcompiler "/wd4819,/EHsc,/W3,/nologo,/O2,/Zi,/MD" \
+                    -Xcompiler "/wd4819,/EHsc,/W3,/nologo,/O2,/Zi" \
                     -Xcompiler $$MSVCRT_LINK_FLAG_RELEASE \
                     -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
     cuda.dependency_type = TYPE_C
